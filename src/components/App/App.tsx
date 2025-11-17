@@ -7,6 +7,7 @@ import Loader from "../Loader/Loader";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import MovieModal from "../MovieModal/MovieModal";
 import { fetchMovies } from "../../services/movieService";
+import type { MoviesResponse } from "../../services/movieService";
 import type { Movie } from "../../types/movie";
 import ReactPaginate from "react-paginate";
 import css from "./App.module.css";
@@ -17,14 +18,12 @@ function App() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery<MoviesResponse>({
     queryKey: ["movies", query, page],
-
     queryFn: () => fetchMovies(query, page),
-
     enabled: !!query,
-
     refetchOnWindowFocus: false,
+    placeholderData: (previousData) => previousData,
   });
 
   useEffect(() => {
@@ -58,7 +57,6 @@ function App() {
         {isLoading && <Loader />}
         {isError && <ErrorMessage />}
 
-        {/* Відображаємо, лише якщо не завантажується і немає помилки */}
         {!isLoading && !isError && (
           <>
             <MovieGrid movies={movies} onSelect={setSelected} />
