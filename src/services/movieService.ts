@@ -19,21 +19,21 @@ interface TmdbSearchResponse {
   total_results: number;
 }
 
-export async function fetchMovies(query: string): Promise<Movie[]> {
-  if (!TOKEN) {
-    // Без токена — безпечне повернення пустого масиву
-    return [];
-  }
+export async function fetchMovies(query: string, page: number) {
+  if (!TOKEN) return { results: [], total_pages: 0 };
 
   const params = {
     query,
     include_adult: false,
     language: "en-US",
-    page: 1,
+    page,
   };
 
   const response: AxiosResponse<TmdbSearchResponse> =
     await axiosInstance.get<TmdbSearchResponse>("/search/movie", { params });
 
-  return response.data.results;
+  return {
+    results: response.data.results,
+    total_pages: response.data.total_pages,
+  };
 }
